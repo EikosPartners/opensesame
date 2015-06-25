@@ -6,6 +6,7 @@ var debug = require('debug')('app:' + process.pid),
     http_port = process.env.HTTP_PORT || 3000,
     https_port = process.env.HTTPS_PORT || 3443,
     jwt = require('express-jwt'),
+    cookieParser = require('cookie-parser'),
     config = require('./config.json'),
     mongoose_uri = process.env.MONGOOSE_URI || 'localhost/express-jwt-auth',
     onFinished = require('on-finished'),
@@ -34,6 +35,7 @@ app.use(require('morgan')('dev'));
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(require('compression')());
 app.use(require('response-time')());
 
@@ -52,14 +54,22 @@ app.use(function (req, res, next) {
 });
 
 var jwtCheck = jwt({
-    secret: config.secret
+    secret: config.secret,
+    getToken: function fromHeaderOrQuerystring (req) {
+        if(req.cookies.user) {
+            console.log(req.cookies.user.token);
+            return req.cookies.user.token;
+        } else {
+            return null;
+        }
+    }
 });
 jwtCheck.unless = unless;
 
 app.use(jwtCheck.unless({path: ['/api/login', '/login'] }));
 app.use(utils.middleware().unless({path: ['/api/login', '/login'] }));
 
-app.use('/', require(path.join(__dirname, 'routes', 'default.js')));
+// app.use('/', require(path.join(__dirname, 'routes', 'default.js')));
 app.use('/login', require(path.join(__dirname, 'routes', 'login.js')));
 app.use('/api', require(path.join(__dirname, 'routes', 'api.js'))());
 
@@ -70,7 +80,7 @@ app.use('/api', require(path.join(__dirname, 'routes', 'api.js'))());
 //
 // error handler for all the applications
 app.use(function (err, req, res, next) {
-
+    console.log('err:', err);
     // var errorType = typeof err,
     //     code = 500,
     //     msg = { message: 'Internal Server Error' };
@@ -92,7 +102,10 @@ app.use(function (err, req, res, next) {
     //
     // return res.status(code).json(msg);
     if (err.name === 'UnauthorizedError') {
+        console.log('UnauthorizedError');
         res.redirect('/login');
+    } else {
+        next();
     }
 
 });

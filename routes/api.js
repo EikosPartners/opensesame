@@ -73,7 +73,9 @@ module.exports = function () {
     });
 
     router.route('/login').post(authenticate, function (req, res, next) {
-        return res.status(200).json(req.user);
+        res.cookie('user', req.user);
+        res.redirect('/');
+        // return res.status(200).json(req.user);
     });
 
     router.unless = require('express-unless');
