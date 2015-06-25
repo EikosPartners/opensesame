@@ -81,33 +81,23 @@ app.use('/api', require(path.join(__dirname, 'routes', 'api.js'))());
 // error handler for all the applications
 app.use(function (err, req, res, next) {
     console.log('err:', err);
-    // var errorType = typeof err,
-    //     code = 500,
-    //     msg = { message: 'Internal Server Error' };
-    //
-    // switch (err.name) {
-    //     case 'UnauthorizedError':
-    //         code = err.status;
-    //         msg = undefined;
-    //         break;
-    //     case 'BadRequestError':
-    //     case 'UnauthorizedAccessError':
-    //     case 'NotFoundError':
-    //         code = err.status;
-    //         msg = err.inner;
-    //         break;
-    //     default:
-    //         break;
-    // }
-    //
-    // return res.status(code).json(msg);
-    if (err.name === 'UnauthorizedError') {
-        console.log('UnauthorizedError');
-        res.redirect('/login');
-    } else {
-        next();
-    }
+    var errorType = typeof err,
+        code = 500,
+        msg = { message: 'Internal Server Error' };
 
+    switch (err.name) {
+        case 'UnauthorizedAccessError':
+        case 'UnauthorizedError':
+            res.redirect('/login');
+            break;
+        case 'BadRequestError':
+        case 'NotFoundError':
+            code = err.status;
+            msg = err.inner;
+            return res.status(code).json(msg);
+        default:
+            next();
+    }
 });
 
 app.use(express.static('public'));

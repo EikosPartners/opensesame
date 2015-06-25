@@ -173,7 +173,7 @@ module.exports.middleware = function () {
 
     var func = function (req, res, next) {
 
-        var token = exports.fetch(req.headers);
+        var token = req.cookies.user ? req.cookies.user.token : null;
 
         exports.retrieve(token, function (err, data) {
 
