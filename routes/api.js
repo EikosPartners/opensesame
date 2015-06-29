@@ -62,20 +62,13 @@ module.exports = function () {
     });
 
     router.route('/logout').get(function (req, res, next) {
-        if (utils.expire(req.headers)) {
-            delete req.user;
-            return res.status(200).json({
-                'message': 'User has been successfully logged out'
-            });
-        } else {
-            return next(new UnauthorizedAccessError('401'));
-        }
+        res.clearCookie('user');
+        res.redirect('/');
     });
 
     router.route('/login').post(authenticate, function (req, res, next) {
         res.cookie('user', req.user);
         res.redirect('/');
-        // return res.status(200).json(req.user);
     });
 
     router.unless = require('express-unless');
