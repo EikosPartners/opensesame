@@ -66,6 +66,8 @@ var jwtCheck = jwt({
 });
 jwtCheck.unless = unless;
 
+app.use(express.static('public'));
+
 app.use(jwtCheck.unless({path: ['/api/login', '/login'] }));
 app.use(utils.middleware().unless({path: ['/api/login', '/login'] }));
 
@@ -100,7 +102,7 @@ app.use(function (err, req, res, next) {
     }
 });
 
-app.use(express.static('public'));
+app.use(express.static('bin'));
 
 console.log('Creating HTTP server on port: %s', http_port);
 require('http').createServer(app).listen(http_port, function () {

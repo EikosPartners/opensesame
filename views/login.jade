@@ -3,14 +3,17 @@ extends layout
 block content
 	#login-container
 		form(action="api/login", method="post")#login-form.well.span4
-			h1 Hello!
-			p.subheading Please Login To Your Account
-			label Username 
-			input(type="text", name="user", id='user-tf').span4.required
-			label Password
-			input(type="password", name="pass", id='pass-tf').span4.required
-			button(type="submit")#btn-login.btn.btn-primary
-				i.icon-lock.icon-white
-				| Sign in
-			div.clear-fix
-			hr
+			div
+				span#logo
+				span.title EIKOS PARTNERS
+			label Username:
+			div
+				input(type="text", name="user", id='user-tf').span4.required
+			label Password:
+			div
+				input(type="password", name="pass", id='pass-tf').span4.required
+			br
+			div
+				button(type="submit")#btn-login.btn.btn-primary
+					i.icon-lock.icon-white
+					| Sign in
