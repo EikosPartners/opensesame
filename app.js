@@ -92,14 +92,14 @@ app.use(function (err, req, res, next) {
         case 'UnauthorizedError':
             res.redirect('/login');
             break;
-        case 'BadRequestError':
-        case 'NotFoundError':
+        default:
             code = err.status;
             msg = err.inner;
             return res.status(code).json(msg);
-        default:
-            next();
     }
+
+    // next();
+
 });
 
 app.use(express.static('bin'));
