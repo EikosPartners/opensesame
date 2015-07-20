@@ -1,59 +1,70 @@
 'use strict';
 
-var debug = require('debug')('app:routes:default' + process.pid),
-    _ = require('lodash'),
-    util = require('util'),
-    path = require('path'),
-    bcrypt = require('bcryptjs'),
-    utils = require('../utils.js'),
-    Router = require('express').Router,
-    UnauthorizedAccessError = require(path.join(__dirname, '..', 'errors', 'UnauthorizedAccessError.js')),
-    User = require(path.join(__dirname, '..', 'models', 'user.js')),
-    jwt = require('express-jwt');
+module.exports = function (config) {
 
-var authenticate = function (req, res, next) {
+    var debug = require('debug')('app:routes:default' + process.pid),
+        _ = require('lodash'),
+        util = require('util'),
+        path = require('path'),
+        bcrypt = require('bcryptjs'),
+        utils = require('../utils.js')(config.secret),
+        Router = require('express').Router,
+        UnauthorizedAccessError = require(path.join(__dirname, '..', 'errors', 'UnauthorizedAccessError.js')),
+        User = require(path.join(__dirname, '..', 'models', 'user.js')),
+        jwt = require('express-jwt');
 
-    console.log('Processing authenticate middleware');
+    var authenticate = function (req, res, next) {
 
-    var username = req.body.user,
-        password = req.body.pass;
+        console.log('Processing authenticate middleware');
 
-    if (_.isEmpty(username) || _.isEmpty(password)) {
-        return next(new UnauthorizedAccessError('401', {
-            message: 'Invalid username or password'
-        }));
-    }
+        var username = req.body.user,
+            password = req.body.pass;
 
-    process.nextTick(function () {
+        if (_.isEmpty(username) || _.isEmpty(password)) {
+            return next(new UnauthorizedAccessError('401', {
+                message: 'Invalid username or password'
+            }));
+        }
 
-        User.findOne({
-            username: username
-        }, function (err, user) {
-
-            if (err || !user) {
-                return next(new UnauthorizedAccessError('401', {
-                    message: 'Invalid username or password'
-                }));
-            }
-
-            user.comparePassword(password, function (err, isMatch) {
+        process.nextTick(function () {
+            console.log('username: ', username, '. password: ', password);
+            config.checkUserName(username, password, function (err, isMatch) {
                 if (isMatch && !err) {
                     console.log('User authenticated, generating token');
-                    utils.create(user, req, res, next);
+                    utils.create(username, req, res, next);
                 } else {
                     return next(new UnauthorizedAccessError('401', {
                         message: 'Invalid username or password'
                     }));
                 }
             });
+
+            // User.findOne({
+            //     username: username
+            // }, function (err, user) {
+            //
+            //     if (err || !user) {
+            //         return next(new UnauthorizedAccessError('401', {
+            //             message: 'Invalid username or password'
+            //         }));
+            //     }
+            //
+            //     user.comparePassword(password, function (err, isMatch) {
+            //         if (isMatch && !err) {
+            //             console.log('User authenticated, generating token');
+            //             utils.create(user, req, res, next);
+            //         } else {
+            //             return next(new UnauthorizedAccessError('401', {
+            //                 message: 'Invalid username or password'
+            //             }));
+            //         }
+            //     });
+            // });
+
         });
 
-    });
 
-
-};
-
-module.exports = function () {
+    };
 
     var router = new Router();
 
