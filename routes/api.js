@@ -27,8 +27,7 @@ module.exports = function (config) {
         }
 
         process.nextTick(function () {
-            console.log('username: ', username, '. password: ', password);
-            config.checkUserName(username, password, function (err, isMatch) {
+            config.checkUser(username, password, function (err, isMatch) {
                 if (isMatch && !err) {
                     console.log('User authenticated, generating token');
                     utils.create(username, req, res, next);
