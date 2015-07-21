@@ -23,7 +23,7 @@ module.exports = function (config) {
 
     console.log('Starting application');
 
-    console.log('Loading Mongoose functionality');
+    // console.log('Loading Mongoose functionality');
     // mongoose.set('debug', true);
     // mongoose.connect(mongoose_uri);
     // mongoose.connection.on('error', function () {

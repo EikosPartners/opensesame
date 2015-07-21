@@ -10,7 +10,7 @@ module.exports = function (config) {
         utils = require('../utils.js')(config.secret),
         Router = require('express').Router,
         UnauthorizedAccessError = require(path.join(__dirname, '..', 'errors', 'UnauthorizedAccessError.js')),
-        User = require(path.join(__dirname, '..', 'models', 'user.js')),
+        // User = require(path.join(__dirname, '..', 'models', 'user.js')),
         jwt = require('express-jwt');
 
     var authenticate = function (req, res, next) {
