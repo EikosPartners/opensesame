@@ -32,6 +32,10 @@ body {
     margin: 0 auto;
 }
 
+#login-container > form > .unauthorized {
+    color: red;
+}
+
 #logo {
     position: absolute;
     margin-top: 3px;
