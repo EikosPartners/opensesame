@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function (config) {
+module.exports = function (config, app) {
 
     var debug = require('debug')('app:' + process.pid),
         path = require('path'),
@@ -12,14 +12,14 @@ module.exports = function (config) {
         onFinished = require('on-finished'),
         // NotFoundError = require(path.join(__dirname, 'errors', 'NotFoundError.js')),
         unless = require('express-unless'),
-        express = require('express'),
-        morgan = require('morgan')('dev'),
-        compression = require('compression')();
+        express = require('express');
+        // morgan = require('morgan')('dev'),
+        // compression = require('compression')();
         // responseTime = require('response-time')(),
         // mongoose = require('mongoose');
 
-
-    var app = express();
+    if(!app)
+        app = express();
 
     console.log('Starting application');
 
@@ -36,30 +36,30 @@ module.exports = function (config) {
     console.log('Initializing express');
 
     console.log('Attaching plugins');
-    app.use(morgan);
+    // app.use(morgan);
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(cookieParser());
-    app.use(compression);
+    // app.use(compression);
     // app.use(responseTime);
 
     // view engine setup
     app.set('views', path.join(__dirname, 'views'));
     app.set('view engine', 'jade');
 
-    app.use(function (req, res, next) {
-
-        onFinished(res, function (err) {
-            console.log('[%s] finished request', req.connection.remoteAddress);
-        });
-
-        next();
-
-    });
+    // app.use(function (req, res, next) {
+    //
+    //     onFinished(res, function (err) {
+    //         console.log('[%s] finished request', req.connection.remoteAddress);
+    //     });
+    //
+    //     next();
+    //
+    // });
 
     var jwtCheck = jwt({
         secret: config.secret,
-        getToken: function fromHeaderOrQuerystring (req) {
+        getToken: function (req) {
             if(req.cookies.user) {
                 console.log(req.cookies.user.token);
                 return req.cookies.user.token;
@@ -92,7 +92,7 @@ module.exports = function (config) {
         switch (err.name) {
             case 'UnauthorizedAccessError':
             case 'UnauthorizedError':
-                res.redirect('/login');
+                res.redirect('/login?unauthorized=' + encodeURIComponent(err.message));
                 break;
             default:
                 code = err.status;
