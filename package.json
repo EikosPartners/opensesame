@@ -23,5 +23,9 @@
     "jsonwebtoken": "^5.0.2",
     "lodash": "^3.9.3",
     "on-finished": "^2.3.0"
+  },
+  "devDependencies": {
+    "bluebird": "^2.9.34",
+    "mssql": "^2.1.6"
   }
 }
