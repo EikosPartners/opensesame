@@ -26,6 +26,10 @@ module.exports = function (config, app) {
         config.redirectUrl = '/';
     }
 
+    if(!config.httpsOnly) {
+        config.httpsOnly = true;
+    }
+
     console.log('Starting application');
 
     // console.log('Loading Mongoose functionality');

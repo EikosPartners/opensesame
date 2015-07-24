@@ -75,7 +75,7 @@ module.exports = function (config) {
     });
 
     router.route('/login').post(authenticate, function (req, res, next) {
-        res.cookie('user', req.user, {secure: true, httpOnly: true});
+        res.cookie('user', req.user, {secure: config.httpsOnly, httpOnly: true});
         res.redirect(config.redirectUrl);
     });
 
