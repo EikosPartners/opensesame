@@ -18,8 +18,13 @@ module.exports = function (config, app) {
         // responseTime = require('response-time')(),
         // mongoose = require('mongoose');
 
-    if(!app)
+    if(!app) {
         app = express();
+    }
+
+    if(!config.redirectUrl) {
+        config.redirectUrl = '/';
+    }
 
     console.log('Starting application');
 

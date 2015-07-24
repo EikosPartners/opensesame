@@ -76,7 +76,7 @@ module.exports = function (config) {
 
     router.route('/login').post(authenticate, function (req, res, next) {
         res.cookie('user', req.user, {secure: true, httpOnly: true});
-        res.redirect('/');
+        res.redirect(config.redirectUrl);
     });
 
     router.unless = require('express-unless');
