@@ -10,7 +10,8 @@ var http_port = process.env.HTTP_PORT || 3000,
 var app = require(path.join(__dirname, "..", "app.js"))({
     secret: config.secret,
     checkUser: require(path.join(__dirname, 'utils.js'))(config.db),
-    redirectUrl: '/app'
+    redirectUrl: '/app',
+    httpsOnly: false
 });
 
 app.use(express.static('bin'));

@@ -22,11 +22,11 @@ module.exports = function (secret) {
             }
 
             var data = {
-                _id: user._id,
-                username: user.username,
-                access: user.access,
-                name: user.name,
-                email: user.email,
+                // _id: user._id,
+                username: user,
+                // access: user.access,
+                // name: user.name,
+                // email: user.email,
                 token: jsonwebtoken.sign({ _id: user._id }, secret, {
                     expiresInMinutes: TOKEN_EXPIRATION
                 })

@@ -22,11 +22,11 @@ module.exports = function (config, app) {
         app = express();
     }
 
-    if(!config.redirectUrl) {
+    if(!config.hasOwnProperty('redirectUrl')) {
         config.redirectUrl = '/';
     }
 
-    if(!config.httpsOnly) {
+    if(!config.hasOwnProperty('httpsOnly')) {
         config.httpsOnly = true;
     }
 
