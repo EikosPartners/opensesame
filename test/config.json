@@ -1,0 +1,10 @@
+{
+    "secret": "temp",
+    "db": {
+        "user": "user",
+        "password": "pass",
+        "server": "server",
+        "port": "1433",
+        "database": "database"
+    }
+}
