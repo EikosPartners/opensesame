@@ -9,8 +9,11 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
     script(type='text/javascript').
         if(typeof(fin) !== 'undefined') {
-            var mainWindow = fin.desktop.Window.getCurrent();
-            mainWindow.resizeTo(500, 375);
+            fin.desktop.main(function () {
+                var mainWindow = fin.desktop.Window.getCurrent();
+                mainWindow.resizeTo(500, 375);
+            })
+            
         }
   body
     block content
