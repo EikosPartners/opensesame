@@ -7,5 +7,10 @@ html
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css')
     link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js')
     link(rel='stylesheet', href='/stylesheets/style.css')
+    script(type='text/javascript').
+        if(typeof(fin) !== 'undefined') {
+            var mainWindow = fin.desktop.Window.getCurrent();
+            mainWindow.resizeTo(500, 375);
+        }
   body
     block content
