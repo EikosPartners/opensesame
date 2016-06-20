@@ -1,13 +1,13 @@
 "use strict";
 
-module.exports = function (secret) {
+module.exports = function (config) {
     var debug = require('debug')('app:utils:' + process.pid),
         path = require('path'),
         util = require('util'),
         _ = require("lodash"),
         jsonwebtoken = require("jsonwebtoken"),
-        TOKEN_EXPIRATION = 60,
-        TOKEN_EXPIRATION_SEC = TOKEN_EXPIRATION * 60,
+        secret = config.secret,
+        TOKEN_EXPIRATION = config.tokenExpiration || '24h',
         UnauthorizedAccessError = require(path.join(__dirname, 'errors', 'UnauthorizedAccessError.js'));
 
     console.log("Loaded");
@@ -22,13 +22,9 @@ module.exports = function (secret) {
             }
 
             var data = {
-                // _id: user._id,
-                username: user,
-                // access: user.access,
-                // name: user.name,
-                // email: user.email,
-                token: jsonwebtoken.sign({ _id: user._id }, secret, {
-                    expiresInMinutes: TOKEN_EXPIRATION
+                user: user,
+                token: jsonwebtoken.sign(user, secret, {
+                    expiresIn: TOKEN_EXPIRATION
                 })
             };
 
@@ -39,14 +35,13 @@ module.exports = function (secret) {
 
             console.log("Token generated for user: %s, token: %s", data.username, data.token);
 
-            req.user = data;
+            req.user = data.token;
             next();
 
             return data;
 
         },
-        TOKEN_EXPIRATION: TOKEN_EXPIRATION,
-        TOKEN_EXPIRATION_SEC: TOKEN_EXPIRATION_SEC
+        TOKEN_EXPIRATION: TOKEN_EXPIRATION
     };
 
 }

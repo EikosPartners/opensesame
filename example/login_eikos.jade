@@ -4,7 +4,8 @@ block content
 	#login-container
 		form(action="auth/login?redirectUrl=#{redirectUrl || ''}", method="post")#login-form.well.span4
 			div
-				span.title LOGIN
+				span#logo
+				span.title EIKOS PARTNERS
 			.unauthorized #{unauthorized}
 			label Username:
 			div

@@ -1,20 +1,31 @@
 var path = require('path'),
     config = require(path.join(__dirname, 'config.json')),
     fs = require('fs'),
-    express = require('express');
+    express = require('express'),
+    app = express();
 
 var http_port = process.env.HTTP_PORT || 3000,
     https_port = process.env.HTTPS_PORT || 3443;
 
 
-var app = require(path.join(__dirname, "..", "app.js"))({
+app.use(express.static(path.join(__dirname, 'public')));
+
+app = require(path.join(__dirname, "..", "app.js"))({
     secret: config.secret,
     checkUser: require(path.join(__dirname, 'utils.js'))(config.db),
     redirectUrl: '/app',
+    customLoginPage: true,
     httpsOnly: false
-});
+}, app);
 
 app.use(express.static('bin'));
+
+app.set('views', __dirname);
+app.set('view engine', 'jade');
+
+app.get('/login', function(req, res, next) {
+    res.render('login_eikos', req.query);
+});
 
 console.log('Creating HTTP server on port: %s', http_port);
 require('http').createServer(app).listen(http_port, function () {

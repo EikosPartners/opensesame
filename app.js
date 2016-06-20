@@ -1,22 +1,16 @@
 'use strict';
 
-module.exports = function (config, app) {
+var debug = require('debug')('app:' + process.pid),
+    path = require('path'),
+    fs = require('fs'),
+    jwt = require('express-jwt'),
+    bodyParser = require('body-parser'),
+    cookieParser = require('cookie-parser'),
+    onFinished = require('on-finished'),
+    unless = require('express-unless'),
+    express = require('express');
 
-    var debug = require('debug')('app:' + process.pid),
-        path = require('path'),
-        fs = require('fs'),
-        jwt = require('express-jwt'),
-        bodyParser = require('body-parser'),
-        cookieParser = require('cookie-parser'),
-        // mongoose_uri = process.env.MONGOOSE_URI || 'localhost/express-jwt-auth',
-        onFinished = require('on-finished'),
-        // NotFoundError = require(path.join(__dirname, 'errors', 'NotFoundError.js')),
-        unless = require('express-unless'),
-        express = require('express');
-        // morgan = require('morgan')('dev'),
-        // compression = require('compression')();
-        // responseTime = require('response-time')(),
-        // mongoose = require('mongoose');
+module.exports = function (config, app) {
 
     if(!app) {
         app = express();
@@ -30,48 +24,27 @@ module.exports = function (config, app) {
         config.httpsOnly = true;
     }
 
-    console.log('Starting application');
+    if(!config.hasOwnProperty('loginUrl')) {
+        config.loginUrl = '/login';
+    }
 
-    // console.log('Loading Mongoose functionality');
-    // mongoose.set('debug', true);
-    // mongoose.connect(mongoose_uri);
-    // mongoose.connection.on('error', function () {
-    //     console.log('Mongoose connection error');
-    // });
-    // mongoose.connection.once('open', function callback() {
-    //     console.log('Mongoose connected to the database');
-    // });
+    if(!config.hasOwnProperty('customLoginPage')) {
+        config.customLoginPage = false;
+    }
 
-    console.log('Initializing express');
-
-    console.log('Attaching plugins');
-    // app.use(morgan);
+    // needed for login forms
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
+
+    //needed for login cookie
     app.use(cookieParser());
-    // app.use(compression);
-    // app.use(responseTime);
-
-    // view engine setup
-    app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'jade');
-
-    // app.use(function (req, res, next) {
-    //
-    //     onFinished(res, function (err) {
-    //         console.log('[%s] finished request', req.connection.remoteAddress);
-    //     });
-    //
-    //     next();
-    //
-    // });
 
     var jwtCheck = jwt({
         secret: config.secret,
         getToken: function (req) {
             if(req.cookies.user) {
-                console.log(req.cookies.user.token);
-                return req.cookies.user.token;
+                console.log(req.cookies.user);
+                return req.cookies.user;
             } else {
                 return null;
             }
@@ -79,18 +52,22 @@ module.exports = function (config, app) {
     });
     jwtCheck.unless = unless;
 
-    app.use(express.static(path.join(__dirname, 'public')));
+    if(!config.customLoginPage) {
+        app.set('views', path.join(__dirname, 'views'));
+        app.set('view engine', 'jade');
+        app.use(express.static(path.join(__dirname, 'public')));
+        app.use(config.loginUrl, require(path.join(__dirname, 'routes/login.js')));
+    }
 
-    app.use(jwtCheck.unless({path: ['/api/login', '/login'] }));
+    app.use(jwtCheck.unless({path: ['/auth/login', config.loginUrl] }));
 
-    app.use('/login', require(path.join(__dirname, 'routes', 'login.js')));
-    app.use('/api', require(path.join(__dirname, 'routes', 'api.js'))(config));
+    app.use('/auth', require(path.join(__dirname, 'routes/auth.js'))(config));
 
     // all other requests redirect to 404
     // app.all('*', function (req, res, next) {
     //     next(new NotFoundError('404'));
     // });
-    //
+
     // error handler for all the applications
     app.use(function (err, req, res, next) {
         console.log('err:', err);
@@ -101,7 +78,12 @@ module.exports = function (config, app) {
         switch (err.name) {
             case 'UnauthorizedAccessError':
             case 'UnauthorizedError':
-                res.redirect('/login?unauthorized=' + encodeURIComponent(err.message));
+                console.log(req.originalUrl);
+                if(req.originalUrl.indexOf('/auth/login') !== -1) {
+                    res.redirect(config.loginUrl + '?unauthorized=' + encodeURIComponent(err.message));
+                } else {
+                    res.redirect(config.loginUrl + '?unauthorized=' + encodeURIComponent(err.message) + '&redirectUrl=' + encodeURIComponent(req.originalUrl));
+                }
                 break;
             default:
                 code = err.status;
