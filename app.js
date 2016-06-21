@@ -25,7 +25,11 @@ module.exports = function (config, app) {
     }
 
     if(!config.hasOwnProperty('cookieKey')) {
-      config.cookieKey = 'auth';
+        config.cookieKey = 'auth';
+    }
+
+    if(!config.hasOwnProperty('useCookieParser')) {
+        config.useCookieParser = true;
     }
 
     if(!config.hasOwnProperty('loginUrl')) {
@@ -37,7 +41,9 @@ module.exports = function (config, app) {
     }
 
     //needed for login cookie
-    app.use(cookieParser());
+    if(config.useCookieParser) {
+        app.use(cookieParser());
+    }
 
     var jwtCheck = jwt({
         secret: config.secret,
