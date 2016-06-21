@@ -1,4 +1,5 @@
 var chai = require('chai'),
+  path = require('path'),
   request = require('supertest'),
   jwt = require('jsonwebtoken'),
   expect = chai.expect;
@@ -16,7 +17,7 @@ var config = {
     httpsOnly: false
   };
 
-var app = require('../app.js')(config);
+var app = require(path.join(__dirname, '../app.js'))(config);
 
 app.get('/', function (req, res) {
   res.send('Hello World!');

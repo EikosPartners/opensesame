@@ -1,6 +1,7 @@
 var chai = require('chai'),
   request = require('supertest'),
   path = require('path'),
+  opensesame = require(path.join(__dirname, '../app.js')),
   jwt = require('jsonwebtoken'),
   express = require('express'),
   AuthenticationError = require(path.join(__dirname, '../errors/AuthenticationError.js')),
@@ -29,7 +30,7 @@ describe('Error Handling Test', function () {
       next(new Error('blah'));
     });
 
-    app = require('../app.js')(config, app);
+    app = opensesame(config, app);
 
     //error handler calls done--if this isn't called it'll timeout
     app.use(function (err, req, res, next) {
@@ -53,9 +54,9 @@ describe('Error Handling Test', function () {
       }));
     });
 
-    app = require('../app.js')(config, app);
+    app = opensesame(config, app);
 
-    //error handler makes preposterous assumption--this will cause the test to fail    
+    //error handler makes preposterous assumption--this will cause the test to fail
     app.use(function (err, req, res, next) {
       expect(false).to.equal(true);
     });
