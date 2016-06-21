@@ -36,10 +36,6 @@ module.exports = function (config, app) {
         config.customLoginPage = false;
     }
 
-    // needed for login forms
-    app.use(bodyParser.json());
-    app.use(bodyParser.urlencoded({ extended: true }));
-
     //needed for login cookie
     app.use(cookieParser());
 
@@ -57,6 +53,8 @@ module.exports = function (config, app) {
     jwtCheck.unless = unless;
 
     if(!config.customLoginPage) {
+        // needed for default login form--a custom form can use bodyParser.json()--as long as the parameters get put on req.body
+        app.use(bodyParser.urlencoded({ extended: true }));
         app.set('views', path.join(__dirname, 'views'));
         app.set('view engine', 'jade');
         app.use(express.static(path.join(__dirname, 'public')));
@@ -79,8 +77,12 @@ module.exports = function (config, app) {
             code = 500,
             msg = { message: 'Internal Server Error' };
 
+        debug('error: ', err.name)
+
         switch (err.name) {
-            case 'UnauthorizedAccessError':
+            case 'AuthenticationError':
+                res.redirect(config.loginUrl + '?unauthorized=' + encodeURIComponent(err.message));
+                break;
             case 'UnauthorizedError':
                 debug(req);
                 if(req.originalUrl.indexOf('/auth/login') !== -1) {

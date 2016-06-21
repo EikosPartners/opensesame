@@ -7,18 +7,18 @@ module.exports = function (config) {
         path = require('path'),
         utils = require('../utils.js')(config),
         Router = require('express').Router,
-        UnauthorizedAccessError = require(path.join(__dirname, '../errors/UnauthorizedAccessError.js')),
+        AuthenticationError = require(path.join(__dirname, '../errors/AuthenticationError.js')),
         jwt = require('express-jwt');
 
     var authenticate = function (req, res, next) {
 
         debug('Processing authenticate middleware');
-
+        debug('req.body: ' + JSON.stringify(req.body));
         var username = req.body.user,
             password = req.body.pass;
 
         if (_.isEmpty(username) || _.isEmpty(password)) {
-            return next(new UnauthorizedAccessError('401', {
+            return next(new AuthenticationError('401', {
                 message: 'Invalid username or password'
             }));
         }
@@ -29,7 +29,7 @@ module.exports = function (config) {
                     debug('User authenticated, generating token');
                     utils.create(user, req, res, next);
                 } else {
-                    return next(new UnauthorizedAccessError('401', {
+                    return next(new AuthenticationError('401', {
                         message: 'Invalid username or password'
                     }));
                 }

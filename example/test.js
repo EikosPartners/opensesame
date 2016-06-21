@@ -1,6 +1,7 @@
 var path = require('path'),
     config = require(path.join(__dirname, 'config.json')),
     fs = require('fs'),
+    bodyParser = require('body-parser'),
     express = require('express'),
     app = express();
 
@@ -10,6 +11,9 @@ var http_port = process.env.HTTP_PORT || 3000,
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(bodyParser.urlencoded({ extended: true }));
+
+//app = require('opensesame')({}, app);
 app = require(path.join(__dirname, "..", "app.js"))({
     secret: config.secret,
     checkUser: require(path.join(__dirname, 'utils.js'))(config.db),
@@ -17,8 +21,6 @@ app = require(path.join(__dirname, "..", "app.js"))({
     customLoginPage: true,
     httpsOnly: false
 }, app);
-
-app.use(express.static('bin'));
 
 app.set('views', __dirname);
 app.set('view engine', 'jade');

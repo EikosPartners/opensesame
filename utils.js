@@ -7,8 +7,7 @@ module.exports = function (config) {
         _ = require("lodash"),
         jsonwebtoken = require("jsonwebtoken"),
         secret = config.secret,
-        TOKEN_EXPIRATION = config.tokenExpiration || '24h',
-        UnauthorizedAccessError = require(path.join(__dirname, 'errors', 'UnauthorizedAccessError.js'));
+        TOKEN_EXPIRATION = config.tokenExpiration || '24h';
 
     return {
         create: function (user, req, res, next) {
