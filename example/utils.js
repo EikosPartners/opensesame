@@ -36,5 +36,5 @@ module.exports = function (config) {
         //     callback(err);
         //     return;
         // });
-    }
-}
+    };
+};

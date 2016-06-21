@@ -11,6 +11,11 @@
     "app.js",
     "utils.js"
   ],
+  "scripts": {
+    "test": "mocha tests/**/*.js --reporter spec -C --timeout 15000",
+    "test-coverage": "istanbul cover _mocha tests/**/*.js -x metaGenAPI/util/**/*.js --print detail",
+    "test-TC": "mocha tests/**/*.js --reporter mocha-teamcity-reporter --timeout 15000"
+  },
   "dependencies": {
     "bcryptjs": "^2.1.0",
     "body-parser": "^1.12.4",
@@ -26,6 +31,10 @@
   },
   "devDependencies": {
     "bluebird": "^2.9.34",
-    "mssql": "^2.1.6"
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.4",
+    "mocha": "^2.5.3",
+    "mssql": "^2.1.6",
+    "supertest": "^1.2.0"
   }
 }

@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = function (config) {
-    var debug = require('debug')('app:utils:' + process.pid),
+    var debug = require('debug')('opensesame'),
         path = require('path'),
         util = require('util'),
         _ = require("lodash"),
@@ -10,12 +10,10 @@ module.exports = function (config) {
         TOKEN_EXPIRATION = config.tokenExpiration || '24h',
         UnauthorizedAccessError = require(path.join(__dirname, 'errors', 'UnauthorizedAccessError.js'));
 
-    console.log("Loaded");
-
     return {
         create: function (user, req, res, next) {
 
-            console.log("Create token");
+            debug("Create token");
 
             if (_.isEmpty(user)) {
                 return next(new Error('User data cannot be empty.'));
@@ -33,7 +31,7 @@ module.exports = function (config) {
             data.token_exp = decoded.exp;
             data.token_iat = decoded.iat;
 
-            console.log("Token generated for user: %s, token: %s", data.username, data.token);
+            debug("Token generated for user: %s, token: %s", user.username, data.token);
 
             req.user = data.token;
             next();

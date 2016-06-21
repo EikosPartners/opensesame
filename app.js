@@ -1,6 +1,6 @@
-'use strict';
+/* global require, module */
 
-var debug = require('debug')('app:' + process.pid),
+var debug = require('debug')('opensesame'),
     path = require('path'),
     fs = require('fs'),
     jwt = require('express-jwt'),
@@ -24,6 +24,10 @@ module.exports = function (config, app) {
         config.httpsOnly = true;
     }
 
+    if(!config.hasOwnProperty('cookieKey')) {
+      config.cookieKey = 'auth';
+    }
+
     if(!config.hasOwnProperty('loginUrl')) {
         config.loginUrl = '/login';
     }
@@ -42,9 +46,9 @@ module.exports = function (config, app) {
     var jwtCheck = jwt({
         secret: config.secret,
         getToken: function (req) {
-            if(req.cookies.user) {
-                console.log(req.cookies.user);
-                return req.cookies.user;
+            if(req.cookies[config.cookieKey]) {
+                debug(req.cookies[config.cookieKey]);
+                return req.cookies[config.cookieKey];
             } else {
                 return null;
             }
@@ -70,7 +74,7 @@ module.exports = function (config, app) {
 
     // error handler for all the applications
     app.use(function (err, req, res, next) {
-        console.log('err:', err);
+        debug('err:', err);
         var errorType = typeof err,
             code = 500,
             msg = { message: 'Internal Server Error' };
@@ -78,7 +82,7 @@ module.exports = function (config, app) {
         switch (err.name) {
             case 'UnauthorizedAccessError':
             case 'UnauthorizedError':
-                console.log(req.originalUrl);
+                debug(req);
                 if(req.originalUrl.indexOf('/auth/login') !== -1) {
                     res.redirect(config.loginUrl + '?unauthorized=' + encodeURIComponent(err.message));
                 } else {

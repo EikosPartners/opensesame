@@ -2,7 +2,7 @@
 
 module.exports = function (config) {
 
-    var debug = require('debug')('app:routes:default' + process.pid),
+    var debug = require('debug')('opensesame'),
         _ = require('lodash'),
         path = require('path'),
         utils = require('../utils.js')(config),
@@ -12,7 +12,7 @@ module.exports = function (config) {
 
     var authenticate = function (req, res, next) {
 
-        console.log('Processing authenticate middleware');
+        debug('Processing authenticate middleware');
 
         var username = req.body.user,
             password = req.body.pass;
@@ -26,7 +26,7 @@ module.exports = function (config) {
         process.nextTick(function () {
             config.checkUser(username, password, function (err, user) {
                 if (user && !err) {
-                    console.log('User authenticated, generating token');
+                    debug('User authenticated, generating token');
                     utils.create(user, req, res, next);
                 } else {
                     return next(new UnauthorizedAccessError('401', {
@@ -47,12 +47,12 @@ module.exports = function (config) {
     });
 
     router.route('/logout').get(function (req, res, next) {
-        res.clearCookie('user');
+        res.clearCookie(config.cookieKey);
         res.redirect('/');
     });
 
     router.route('/login').post(authenticate, function (req, res, next) {
-        res.cookie('user', req.user, {secure: config.httpsOnly, httpOnly: true});
+        res.cookie(config.cookieKey, req.user, {secure: config.httpsOnly, httpOnly: true});
         if(req.query.redirectUrl) {
             res.redirect(req.query.redirectUrl);
         } else {
@@ -64,5 +64,3 @@ module.exports = function (config) {
 
     return router;
 };
-
-console.log('Loaded');
