@@ -92,15 +92,16 @@ module.exports = function (config, app) {
             case 'UnauthorizedError':
                 debug(req);
                 if(req.originalUrl.indexOf('/auth/login') !== -1) {
+                    // this is run when you click sign in on the login page and it redirects you back to /login
+                    // if this branch was not here it would keep appending &redirectUrl=/auth/login everytime
+                    // you typed a bad login
                     res.redirect(config.loginUrl + '?unauthorized=' + encodeURIComponent(err.message));
                 } else {
                     res.redirect(config.loginUrl + '?unauthorized=' + encodeURIComponent(err.message) + '&redirectUrl=' + encodeURIComponent(req.originalUrl));
                 }
                 break;
             default:
-                code = err.status;
-                msg = err.inner;
-                return res.status(code).json(msg);
+                next(err);
         }
 
     });
