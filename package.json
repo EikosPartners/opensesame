@@ -1,6 +1,6 @@
 {
   "name": "opensesame",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "homepage": "https://github.com/EikosPartners/opensesame",
   "main": "app.js",
   "files": [
