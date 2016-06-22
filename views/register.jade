@@ -2,9 +2,9 @@ extends layout
 
 block content
 	#login-container
-		form(action="auth/login?redirectUrl=#{redirectUrl || ''}", method="post")#login-form.well.span4
+		form(action="auth/register", method="post")#login-form.well.span4
 			div
-				span.title Login
+				span.title Register
 			.unauthorized #{unauthorized}
 			label Username:
 			div
@@ -12,9 +12,11 @@ block content
 			label Password:
 			div
 				input(type="password", name="pass").span4.required
-			a(href="/register") Register
+			label Confirm Password:
+			div
+				input(type="password2", name="pass").span4.required
 			br
 			div
 				button(type="submit")#btn-login.btn.btn-primary
 					i.icon-lock.icon-white
-					| Sign in
+					| Register

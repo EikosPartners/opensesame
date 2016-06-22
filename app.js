@@ -36,8 +36,16 @@ module.exports = function (config, app) {
         config.loginUrl = '/login';
     }
 
+    if(!config.hasOwnProperty('registerUrl')) {
+        config.registerUrl = '/register';
+    }
+
     if(!config.hasOwnProperty('customLoginPage')) {
         config.customLoginPage = false;
+    }
+
+    if(!config.hasOwnProperty('customRegisterPage')) {
+        config.customRegisterPage = false;
     }
 
     //needed for login cookie
@@ -58,16 +66,23 @@ module.exports = function (config, app) {
     });
     jwtCheck.unless = unless;
 
-    if(!config.customLoginPage) {
+    if(!config.customLoginPage || !config.customRegisterPage) {
         // needed for default login form--a custom form can use bodyParser.json()--as long as the parameters get put on req.body
         app.use(bodyParser.urlencoded({ extended: true }));
         app.set('views', path.join(__dirname, 'views'));
         app.set('view engine', 'jade');
         app.use(express.static(path.join(__dirname, 'public')));
+    }
+
+    if(!config.customLoginPage) {
         app.use(config.loginUrl, require(path.join(__dirname, 'routes/login.js')));
     }
 
-    app.use(jwtCheck.unless({path: ['/auth/login', config.loginUrl] }));
+    if(!config.customRegisterPage) {
+        app.use(config.registerUrl, require(path.join(__dirname, 'routes/register.js')));
+    }
+
+    app.use(jwtCheck.unless({path: ['/auth/login', '/auth/register', config.loginUrl, config.registerUrl] }));
 
     app.use('/auth', require(path.join(__dirname, 'routes/auth.js'))(config));
 

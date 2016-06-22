@@ -3,31 +3,33 @@ var path = require('path'),
     fs = require('fs'),
     bodyParser = require('body-parser'),
     express = require('express'),
+    utils = require(path.join(__dirname, 'utils.js'))(config.db),
     app = express();
 
 var http_port = process.env.HTTP_PORT || 3000,
     https_port = process.env.HTTPS_PORT || 3443;
 
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //app = require('opensesame')({}, app);
 app = require(path.join(__dirname, "..", "app.js"))({
     secret: config.secret,
-    checkUser: require(path.join(__dirname, 'utils.js'))(config.db),
+    checkUser: utils.checkUser,
+    registerUser: utils.registerUser,
     redirectUrl: '/app',
-    customLoginPage: true,
+    // customLoginPage: true,
     httpsOnly: false
 }, app);
 
-app.set('views', __dirname);
-app.set('view engine', 'jade');
-
-app.get('/login', function(req, res, next) {
-    res.render('login_eikos', req.query);
-});
+// app.set('views', __dirname);
+// app.set('view engine', 'jade');
+//
+// app.get('/login', function(req, res, next) {
+//     res.render('login_eikos', req.query);
+// });
 
 console.log('Creating HTTP server on port: %s', http_port);
 require('http').createServer(app).listen(http_port, function () {

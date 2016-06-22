@@ -5,22 +5,33 @@ var chai = require('chai'),
   jwt = require('jsonwebtoken'),
   expect = chai.expect;
 
+var userStore = {
+
+};
 
 var config = {
     secret: 'test',
-    checkUser: function (username, password, callback) {
-      if(username === 'peter' && password === 'test1234') {
-        callback(null, {username: 'peter'});
+    checkUser: function (userObject, callback) {
+      var username = userObject.user;
+      var password = userObject.pass;
+      if(userStore.hasOwnProperty(username) && userStore[username] === password) {
+        callback(null, {username: username});
       } else {
         callback('Incorrect credentials');
       }
+    },
+    registerUser: function(userObject, callback) {
+      var username = userObject.user;
+      var password = userObject.pass;
+      userStore[username] = password;
+      callback(null, {username: username});
     },
     httpsOnly: false
   };
 
 var app = opensesame(config);
 
-app.get('/', function (req, res) {  
+app.get('/', function (req, res) {
   res.send('Hello World!');
 });
 
@@ -34,7 +45,56 @@ app.get('/test', function (req, res) {
 var agent = request.agent(app);
 
 describe('Authentication Test', function () {
+  describe('Register Test', function () {
+    it('should show a register page', function (done) {
+      agent.get('/register')
+        .expect(200)
+        .expect(function (res) {
+          expect(res.text).to.contain('<html>');
+        })
+        .end(done);
+    });
+    it('should verify that you are not logged in', function (done) {
+      agent.get('/auth/verify')
+        .expect(302)
+        .end(done);
+    });
+    it('should fail to register when passwords don\'t match', function (done) {
+      agent.post('/auth/register')
+        .type('form')
+        .send({ user: 'peter', pass: 'test1234', pass2: 'test12345' })
+        .end(done);
+    });
+    it('should register a new user and login', function (done) {
+      agent.post('/auth/register')
+        .type('form')
+        .send({ user: 'peter', pass: 'test1234', pass2: 'test1234' })
+        .expect('set-cookie', /auth=[\w\-_]+?\.[\w\-_]+?\.[\w\-_]+; Path=\/; HttpOnly/)
+        .expect(function (res) {
+          var userCookieRegex = /auth=([\w\-_]+?\.[\w\-_]+?\.[\w\-_]+); Path=\/; HttpOnly/g;
+          var userCookie = res.headers['set-cookie'][0];
+          var matches = userCookieRegex.exec(userCookie);
+          var token = matches[1];
+          expect(token).to.not.be.a('null');
+          expect(token).to.not.be.a('undefined');
+          var decoded = jwt.verify(token, config.secret);
+          expect(decoded).to.be.an('object');
+          expect(decoded).to.have.ownProperty('username');
+          expect(decoded.username).to.equal('peter');
+        })
+        .end(done);
+    });
+    it('should verify that you are logged in', function (done) {
+      agent.get('/auth/verify')
+        .expect(200)
+        .end(done);
+    });
+  });
   describe('Login test', function () {
+    before(function (done) {
+      agent.get('/auth/logout')
+        .end(done);
+    });
     it('should show a login page', function (done) {
       agent.get('/login')
         .expect(200)
