@@ -70,7 +70,7 @@ module.exports = function (config, app) {
         // needed for default login form--a custom form can use bodyParser.json()--as long as the parameters get put on req.body
         app.use(bodyParser.urlencoded({ extended: true }));
         app.set('views', path.join(__dirname, 'views'));
-        app.set('view engine', 'jade');
+        app.set('view engine', 'pug');
         app.use(express.static(path.join(__dirname, 'public')));
     }
 
