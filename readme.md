@@ -18,11 +18,14 @@ It provides the following routes for authentication purposes:
 ## Configuration options
 The following are options that can be passed to opensesame:
 ### Required
+
 - __secret__ - A string which is used by the JWT library to crpytographically sign and verify JWTs.
 - __checkUser__ - A function that takes the object that the login page sends to the server and calls a callback with either an error or the user object that will be stored on the JWT. Should check that the username and password are correct. _function checkUser(userObject, callback)_
 - __registerUser__ - A function that takes the object that the registration page sends to the server and calls a callback with either an error or the user object that will be stored on the JWT. Should store the user credentials somewhere for later lookup by the checkUser function. _function registerUser(userObject, callback)_
 - __refreshUser__ - A function that gets an already authenticated user based on the value of the JWT. Should return an up to date user object that will be stored on the JWT. _function refreshUser(userObject, callback)_
+
 ### Optional
+
 - __redirectUrl__ - A string specifying a route of where to redirect the user after authenticating. __/__ by default.
 - __httpsOnly__ - Specifies whether the cookie should use the secure flag. If true then authentication only works over HTTPS. __true__ by default.
 - __cookieKey__ - The name of the key that is set on the client browser's cookie. __auth__ by default.
