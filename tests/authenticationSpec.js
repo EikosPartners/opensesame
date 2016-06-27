@@ -26,6 +26,9 @@ var config = {
       userStore[username] = password;
       callback(null, {username: username});
     },
+    refreshUser: function(userObject, callback) {
+      callback(null, userObject);
+    },
     httpsOnly: false
   };
 
@@ -90,23 +93,6 @@ describe('Authentication Test', function () {
         .end(done);
     });
   });
-  it('should refresh the user', function (done) {
-    agent.post('/auth/refresh')
-      .expect('set-cookie', /auth=[\w\-_]+?\.[\w\-_]+?\.[\w\-_]+; Path=\/; HttpOnly/)
-      .expect(function (res) {
-        var userCookieRegex = /auth=([\w\-_]+?\.[\w\-_]+?\.[\w\-_]+); Path=\/; HttpOnly/g;
-        var userCookie = res.headers['set-cookie'][0];
-        var matches = userCookieRegex.exec(userCookie);
-        var token = matches[1];
-        expect(token).to.not.be.a('null');
-        expect(token).to.not.be.a('undefined');
-        var decoded = jwt.verify(token, config.secret);
-        expect(decoded).to.be.an('object');
-        expect(decoded).to.have.ownProperty('username');
-        expect(decoded.username).to.equal('peter');
-      })
-      .expect(200, done);
-  });
   describe('Login test', function () {
     before(function (done) {
       agent.get('/auth/logout')
@@ -169,6 +155,23 @@ describe('Authentication Test', function () {
       agent.get('/auth/verify')
         .expect(200)
         .end(done);
+    });
+    it('should refresh the user', function (done) {
+      agent.get('/auth/refresh')
+        .expect('set-cookie', /auth=[\w\-_]+?\.[\w\-_]+?\.[\w\-_]+; Path=\/; HttpOnly/)
+        .expect(function (res) {
+          var userCookieRegex = /auth=([\w\-_]+?\.[\w\-_]+?\.[\w\-_]+); Path=\/; HttpOnly/g;
+          var userCookie = res.headers['set-cookie'][0];
+          var matches = userCookieRegex.exec(userCookie);
+          var token = matches[1];
+          expect(token).to.not.be.a('null');
+          expect(token).to.not.be.a('undefined');
+          var decoded = jwt.verify(token, config.secret);
+          expect(decoded).to.be.an('object');
+          expect(decoded).to.have.ownProperty('username');
+          expect(decoded.username).to.equal('peter');
+        })
+        .expect(200, done);
     });
     it('should set req.user to the return value of checkUser', function (done) {
       agent.get('/test')
