@@ -1,6 +1,6 @@
 {
   "name": "opensesame",
-  "version": "1.0.12",
+  "version": "1.1.0",
   "homepage": "https://github.com/EikosPartners/opensesame",
   "main": "app.js",
   "files": [
@@ -12,6 +12,7 @@
     "utils.js"
   ],
   "scripts": {
+    "start": "node example/index.js",
     "test": "mocha tests/**/*.js --reporter spec -C --timeout 15000",
     "test-coverage": "istanbul cover _mocha tests/**/*.js --print detail",
     "test-TC": "mocha tests/**/*.js --reporter mocha-teamcity-reporter --timeout 15000"

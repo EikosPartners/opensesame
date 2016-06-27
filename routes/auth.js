@@ -68,10 +68,31 @@ module.exports = function (config) {
         });
     };
 
+    var refresh = function (req, res, next) {
+        debug('Processing refresh middleware')
+        process.nextTick(function () {
+            config.refreshUser(req.user, function (err, user) {
+                if (user && !err) {
+                    debug('User refreshed, generating new token');
+                    utils.create(user, req, res, next);
+                } else {
+                    return next(new AuthenticationError('401', {
+                        message: err
+                    }));
+                }
+            });
+        });
+    };
+
     var router = new Router();
 
     router.route('/verify').get(function (req, res, next) {
         return res.status(200).end();
+    });
+
+    router.route('/refresh').get(refresh, function (req, res, next) {
+        res.cookie(config.cookieKey, req.user, {secure: config.httpsOnly, httpOnly: true});
+        res.status(200).end();
     });
 
     router.route('/logout').get(function (req, res, next) {

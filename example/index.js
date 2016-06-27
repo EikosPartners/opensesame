@@ -19,6 +19,7 @@ app = require(path.join(__dirname, "..", "app.js"))({
     secret: config.secret,
     checkUser: utils.checkUser,
     registerUser: utils.registerUser,
+    refreshUser: utils.refreshUser,
     redirectUrl: '/app',
     // customLoginPage: true,
     httpsOnly: false

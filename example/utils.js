@@ -39,6 +39,9 @@ module.exports = function (config) {
         },
         registerUser: function (userObject, callback) {
             callback(null, {username: 'peter'});
+        },
+        refreshUser: function (userObject, callback) {
+            callback(null, userObject);
         }
     };
 };
