@@ -1,5 +1,5 @@
 # OpenSesame
-![Travis](https://travis-ci.org/EikosPartners/opensesame.svg?branch=master)
+[![Build Status](https://travis-ci.org/EikosPartners/opensesame.svg?branch=master)](https://travis-ci.org/EikosPartners/opensesame)
 
 OpenSesame is a authentication system that provides authentication through the use of Json Web Tokens (JWT) and secure, httpOnly cookies. It provides a login page and a register page but allows for custom login and register pages as well.
 
