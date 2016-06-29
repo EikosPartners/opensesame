@@ -59,6 +59,8 @@ openSesame({
     redirectUrl: '/app',
     httpsOnly: false
 }, app);
+```
+```
 //or have it generate one for you
 var app = openSesame({
     secret: 'testSecret',
