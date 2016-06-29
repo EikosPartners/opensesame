@@ -2,7 +2,7 @@ extends layout
 
 block content
 	#login-container
-		form(action="auth/login?redirectUrl=#{redirectUrl || ''}", method="post")#login-form.well.span4
+		form(action=redirectUrl ? ("auth/login?redirectUrl=" + redirectUrl) : "auth/login", method="post")#login-form.well.span4
 			div
 				span.title Login
 			.unauthorized #{unauthorized}
