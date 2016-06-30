@@ -6,7 +6,7 @@ module.exports = function (config) {
         _ = require('lodash'),
         path = require('path'),
         utils = require('../utils.js')(config),
-        Router = require('express').Router,        
+        Router = require('express').Router,
         jwt = require('express-jwt');
 
     var router = new Router();
@@ -34,7 +34,7 @@ module.exports = function (config) {
         }
     });
 
-    router.route('/register').post(utils.register, function (req, res, next) {
+    router.route('/register').post(utils.register, function (req, res, next) {        
         res.cookie(config.cookieKey, req.user, {secure: config.httpsOnly, httpOnly: true});
         if(req.query.redirectUrl) {
             res.redirect(req.query.redirectUrl);

@@ -77,7 +77,7 @@ module.exports = function (config) {
                 }));
             }
 
-            if(!config.customRegisterPage && userObject.pass !== userObject.pass2) {
+            if(!config.customRegisterPage && userObject.password !== userObject.password2) {
                 return next(new AuthenticationError('401', {
                     message: 'Passwords do not match'
                 }));

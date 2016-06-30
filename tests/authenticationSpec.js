@@ -12,17 +12,17 @@ var userStore = {
 var config = {
     secret: 'test',
     checkUser: function (userObject, callback) {
-      var username = userObject.user;
-      var password = userObject.pass;
+      var username = userObject.username;
+      var password = userObject.password;
       if(userStore.hasOwnProperty(username) && userStore[username] === password) {
         callback(null, {username: username});
       } else {
         callback('Incorrect credentials');
       }
     },
-    registerUser: function(userObject, callback) {
-      var username = userObject.user;
-      var password = userObject.pass;
+    registerUser: function(userObject, callback) {      
+      var username = userObject.username;
+      var password = userObject.password;
       userStore[username] = password;
       callback(null, {username: username});
     },
@@ -65,13 +65,13 @@ describe('Authentication Test', function () {
     it('should fail to register when passwords don\'t match', function (done) {
       agent.post('/auth/register')
         .type('form')
-        .send({ user: 'peter', pass: 'test1234', pass2: 'test12345' })
+        .send({ username: 'peter', password: 'test1234', password2: 'test12345' })
         .end(done);
     });
     it('should register a new user and login', function (done) {
       agent.post('/auth/register')
         .type('form')
-        .send({ user: 'peter', pass: 'test1234', pass2: 'test1234' })
+        .send({ username: 'peter', password: 'test1234', password2: 'test1234' })
         .expect('set-cookie', /auth=[\w\-_]+?\.[\w\-_]+?\.[\w\-_]+; Path=\/; HttpOnly/)
         .expect(function (res) {
           var userCookieRegex = /auth=([\w\-_]+?\.[\w\-_]+?\.[\w\-_]+); Path=\/; HttpOnly/g;
@@ -119,14 +119,14 @@ describe('Authentication Test', function () {
     it('should not login on bad credentials', function(done) {
       agent.post('/auth/login')
         .type('form')
-        .send({ user: 'peter', pass: 'test12345' })
+        .send({ username: 'peter', password: 'test12345' })
         .expect(302)
         .end(done);
     });
     it('should login', function(done) {
       agent.post('/auth/login')
         .type('form')
-        .send({ user: 'peter', pass: 'test1234' })
+        .send({ username: 'peter', password: 'test1234' })
         .expect(302)
         .expect('set-cookie', /auth=[\w\-_]+?\.[\w\-_]+?\.[\w\-_]+; Path=\/; HttpOnly/)
         .expect(function (res) {
