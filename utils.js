@@ -7,36 +7,110 @@ module.exports = function (config) {
         _ = require("lodash"),
         jsonwebtoken = require("jsonwebtoken"),
         secret = config.secret,
-        TOKEN_EXPIRATION = config.tokenExpiration || '24h';
+        AuthenticationError = require(path.join(__dirname, './errors/AuthenticationError.js')),
+        TOKEN_EXPIRATION = config.tokenExpiration;
+
+    let createJWT = function (user, req, res, next) {
+
+        debug("Create token");
+
+        if (_.isEmpty(user)) {
+            return next(new Error('User data cannot be empty.'));
+        }
+
+        var data = {
+            user: user,
+            token: jsonwebtoken.sign(user, secret, {
+                expiresIn: TOKEN_EXPIRATION
+            })
+        };
+
+        var decoded = jsonwebtoken.decode(data.token);
+
+        data.token_exp = decoded.exp;
+        data.token_iat = decoded.iat;
+
+        debug("Token generated for user: %s, token: %s", user.username, data.token);
+
+        req.user = data.token;
+        next();
+
+        return data;
+
+    };
 
     return {
-        create: function (user, req, res, next) {
+        create: createJWT,
+        authenticate: function (req, res, next) {
+            debug('Processing authenticate middleware');
+            debug('req.body: ' + JSON.stringify(req.body));
+            var userObject = req.body;
 
-            debug("Create token");
-
-            if (_.isEmpty(user)) {
-                return next(new Error('User data cannot be empty.'));
+            if (_.isEmpty(userObject)) {
+                return next(new AuthenticationError('401', {
+                    message: 'Missing username or password'
+                }));
             }
 
-            var data = {
-                user: user,
-                token: jsonwebtoken.sign(user, secret, {
-                    expiresIn: TOKEN_EXPIRATION
-                })
-            };
+            process.nextTick(function () {
+                config.checkUser(userObject, function (err, user) {
+                    if (user && !err) {
+                        debug('User authenticated, generating token');
+                        createJWT(user, req, res, next);
+                    } else {
+                        return next(new AuthenticationError('401', {
+                            message: err
+                        }));
+                    }
+                });
 
-            var decoded = jsonwebtoken.decode(data.token);
+            });
+        },
+        register: function (req, res, next) {
+            debug('Processing register middleware');
+            debug('req.body: ' + JSON.stringify(req.body));
+            var userObject = req.body;
 
-            data.token_exp = decoded.exp;
-            data.token_iat = decoded.iat;
+            if (_.isEmpty(userObject)) {
+                return next(new AuthenticationError('401', {
+                    message: 'Missing username or password'
+                }));
+            }
 
-            debug("Token generated for user: %s, token: %s", user.username, data.token);
+            if(!config.customRegisterPage && userObject.pass !== userObject.pass2) {
+                return next(new AuthenticationError('401', {
+                    message: 'Passwords do not match'
+                }));
+            }
 
-            req.user = data.token;
-            next();
+            process.nextTick(function () {
+                config.registerUser(userObject, function (err, user) {
+                    if (user && !err) {
+                        debug('User registered, generating token');
+                        createJWT(user, req, res, next);
+                    } else {
+                        return next(new AuthenticationError('401', {
+                            message: err
+                        }));
+                    }
+                });
 
-            return data;
-
+            });
+        },
+        refresh: function (req, res, next) {
+            debug('Processing refresh middleware')
+            process.nextTick(function () {
+                config.refreshUser(req.user, function (err, user) {
+                    if (user && !err) {
+                        debug('User refreshed, generating new token');
+                        createJWT(user, req, res, next);
+                    } else {
+                        return next(new AuthenticationError('401', {
+                            message: err
+                        }));
+                    }
+                });
+            });
         },
         TOKEN_EXPIRATION: TOKEN_EXPIRATION
     };

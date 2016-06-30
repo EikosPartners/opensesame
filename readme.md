@@ -31,6 +31,7 @@ The following are options that can be passed to opensesame:
 - __httpsOnly__ - Specifies whether the cookie should use the secure flag. If true then authentication only works over HTTPS. __true__ by default.
 - __cookieKey__ - The name of the key that is set on the client browser's cookie. __auth__ by default.
 - __useCookieParser__ - A flag specifying whether to use cookie parser middleware or not. OpenSesame will not work properly if cookie parser middleware is not used. __true__ by default
+- __tokenExpiration__ - Specifies how long the JWT should remain valid for. Follows the [rauchg/ms(https://github.com/rauchg/ms.js)] convention. __24h__ by default.
 - __loginUrl__ - The url that renders the login page. Users will be redirected here when they try to view a protected resource. __/login__ by default.
 - __registerUrl__ - The url that renders the registration page. __/register__ by default.
 - __customLoginPage__ - A flag that tells OpenSesame whether to set up its own login page. If true then OpenSesame will not set up the /login route and login page. __false__ by default.

@@ -8,45 +8,28 @@ var debug = require('debug')('opensesame'),
     cookieParser = require('cookie-parser'),
     onFinished = require('on-finished'),
     unless = require('express-unless'),
-    express = require('express');
+    express = require('express'),
+    utils = require('./utils'),
+    _ = require('lodash'),
+    defaultConfig = {
+        redirectUrl: '/',
+        httpsOnly: true,
+        cookieKey: 'auth',
+        useCookieParser: true,
+        tokenExpiration: '24h',
+        loginUrl: '/login',
+        registerUrl: '/register',
+        customLoginPage: false,
+        customRegisterPage: false
+    };
 
-module.exports = function (config, app) {
+let obj = function (config, app) {
 
     if(!app) {
         app = express();
     }
 
-    if(!config.hasOwnProperty('redirectUrl')) {
-        config.redirectUrl = '/';
-    }
-
-    if(!config.hasOwnProperty('httpsOnly')) {
-        config.httpsOnly = true;
-    }
-
-    if(!config.hasOwnProperty('cookieKey')) {
-        config.cookieKey = 'auth';
-    }
-
-    if(!config.hasOwnProperty('useCookieParser')) {
-        config.useCookieParser = true;
-    }
-
-    if(!config.hasOwnProperty('loginUrl')) {
-        config.loginUrl = '/login';
-    }
-
-    if(!config.hasOwnProperty('registerUrl')) {
-        config.registerUrl = '/register';
-    }
-
-    if(!config.hasOwnProperty('customLoginPage')) {
-        config.customLoginPage = false;
-    }
-
-    if(!config.hasOwnProperty('customRegisterPage')) {
-        config.customRegisterPage = false;
-    }
+    config = _.assignIn(defaultConfig, config);
 
     //needed for login cookie
     if(config.useCookieParser) {
@@ -124,3 +107,7 @@ module.exports = function (config, app) {
     return app;
 
 };
+
+obj.utils = utils;
+
+module.exports = obj;
