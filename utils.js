@@ -29,6 +29,7 @@ module.exports = function (config) {
 
         data.token_exp = decoded.exp;
         data.token_iat = decoded.iat;
+        data.decoded = decoded;
 
         debug("Token generated for user: %s, token: %s", user.username, data.token);
 
