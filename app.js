@@ -108,6 +108,9 @@ let obj = function (config, app) {
 
 };
 
-obj.utils = utils;
+obj.utils = function(config) {
+    config = _.assignIn(defaultConfig, config);
+    return utils(config);
+};
 
 module.exports = obj;
