@@ -42,6 +42,9 @@ module.exports = function (config) {
 
     return {
         create: createJWT,
+        setCookie: function (req, res, next) {
+            res.cookie(config.cookieKey, req.user, {secure: config.httpsOnly, httpOnly: true});
+        },
         authenticate: function (req, res, next) {
             debug('Processing authenticate middleware');
             debug('req.body: ' + JSON.stringify(req.body));
