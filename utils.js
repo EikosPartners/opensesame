@@ -42,6 +42,9 @@ module.exports = function (config) {
         setAuthCookie: function (value, req, res, next) {
             res.cookie(config.cookieKey, value, {secure: config.httpsOnly, httpOnly: true});
         },
+        clearAuthCookie: function (req, res, next) {
+            res.clearCookie(config.cookieKey);
+        },
         authenticate: function (req, res, next) {
             debug('Processing authenticate middleware');
             debug('req.body: ' + JSON.stringify(req.body));
