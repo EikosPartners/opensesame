@@ -33,9 +33,6 @@ module.exports = function (config) {
 
         debug("Token generated for user: %s, token: %s", user.username, data.token);
 
-        req.user = data.token;
-        next();
-
         return data;
 
     };
@@ -60,7 +57,9 @@ module.exports = function (config) {
                 config.checkUser(userObject, function (err, user) {
                     if (user && !err) {
                         debug('User authenticated, generating token');
-                        createJWT(user, req, res, next);
+                        var data = createJWT(user, req, res, next);
+                        req.user = data.token;
+                        next();
                     } else {
                         return next(new AuthenticationError('401', {
                             message: err
@@ -91,7 +90,9 @@ module.exports = function (config) {
                 config.registerUser(userObject, function (err, user) {
                     if (user && !err) {
                         debug('User registered, generating token');
-                        createJWT(user, req, res, next);
+                        var data = createJWT(user, req, res, next);
+                        req.user = data.token;
+                        next();
                     } else {
                         return next(new AuthenticationError('401', {
                             message: err
@@ -107,7 +108,9 @@ module.exports = function (config) {
                 config.refreshUser(req.user, function (err, user) {
                     if (user && !err) {
                         debug('User refreshed, generating new token');
-                        createJWT(user, req, res, next);
+                        var data = createJWT(user, req, res, next);
+                        req.user = data.token;
+                        next();
                     } else {
                         return next(new AuthenticationError('401', {
                             message: err
